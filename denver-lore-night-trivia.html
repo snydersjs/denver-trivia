@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Denver Lore Night — Trivia Prep</title>
+<style>
+  :root {
+    --bg: #faf9f6;
+    --surface: #ffffff;
+    --surface2: #f3f1ec;
+    --border: rgba(0,0,0,0.1);
+    --border-med: rgba(0,0,0,0.18);
+    --text: #1a1a17;
+    --text-secondary: #6b6b63;
+    --text-tertiary: #9a9a90;
+    --accent: #c8410a;
+    --accent-light: #fdf0ea;
+    --success-bg: #eaf5e8;
+    --success-text: #2a6e22;
+    --danger-bg: #fdecea;
+    --danger-text: #a32020;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #18181500;
+      --bg: #1c1b18;
+      --surface: #252420;
+      --surface2: #2e2d29;
+      --border: rgba(255,255,255,0.1);
+      --border-med: rgba(255,255,255,0.18);
+      --text: #f0efe9;
+      --text-secondary: #a09e95;
+      --text-tertiary: #6e6c64;
+      --accent: #e05a1a;
+      --accent-light: #2a1a0e;
+      --success-bg: #0e2410;
+      --success-text: #6bcf5e;
+      --danger-bg: #250e0e;
+      --danger-text: #f08080;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  header {
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    padding: 20px 24px 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+  }
+  .header-title h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  .header-title p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+  .event-badge {
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--accent);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+  .tabs {
+    display: flex;
+    gap: 0;
+  }
+  .tab-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    background: none;
+    border: none;
+    border-bottom: 2.5px solid transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+  .tab-btn.active {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+  }
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* FACTOIDS */
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .filter-btn {
+    padding: 5px 13px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 0.5px solid var(--border-med);
+    border-radius: 20px;
+    background: var(--surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .filter-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .category-section { margin-bottom: 28px; }
+  .cat-heading {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-tertiary);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .fact-row {
+    display: flex;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 0.5px solid var(--border);
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .fact-row:last-child { border-bottom: none; }
+  .fact-key {
+    font-weight: 600;
+    color: var(--text);
+    min-width: 160px;
+    flex-shrink: 0;
+  }
+  .fact-val { color: var(--text-secondary); }
+
+  /* QUIZ */
+  .quiz-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .progress-info { font-size: 13px; color: var(--text-secondary); }
+  .score-pill {
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    color: var(--text);
+  }
+  .progress-bar-wrap {
+    width: 100%;
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 3px;
+    margin-bottom: 20px;
+  }
+  .progress-bar-fill {
+    height: 3px;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.3s;
+  }
+  .q-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+  .q-cat-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .q-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+  .answer-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .answer-input {
+    flex: 1;
+    padding: 9px 13px;
+    font-size: 14px;
+    border: 0.5px solid var(--border-med);
+    border-radius: var(--radius-sm);
+    background: var(--surface2);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .answer-input:focus { border-color: var(--accent); }
+  .reveal-btn {
+    padding: 9px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.12s;
+  }
+  .reveal-btn:hover { opacity: 0.88; }
+  .answer-box {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    display: none;
+  }
+  .answer-box.show { display: block; }
+  .answer-box-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-tertiary);
+    margin-bottom: 5px;
+  }
+  .answer-box-text {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .grade-row {
+    display: none;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .grade-row.show { display: flex; }
+  .grade-btn {
+    flex: 1;
+    padding: 9px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: 0.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    transition: all 0.12s;
+  }
+  .grade-btn.got { background: var(--success-bg); color: var(--success-text); border-color: var(--success-text); }
+  .grade-btn.missed { background: var(--danger-bg); color: var(--danger-text); border-color: var(--danger-text); }
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .nav-btn {
+    padding: 9px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border: 0.5px solid var(--border-med);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .nav-btn:hover { background: var(--surface2); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .nav-btn:disabled:hover { background: var(--surface); }
+  .shuffle-link {
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .done-screen {
+    text-align: center;
+    padding: 48px 20px;
+    display: none;
+  }
+  .done-screen.show { display: block; }
+  .done-score-num {
+    font-size: 52px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .done-score-label {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+  .done-message {
+    font-size: 14px;
+    color: var(--text-tertiary);
+    margin-bottom: 28px;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .restart-btn {
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: opacity 0.12s;
+  }
+  .restart-btn:hover { opacity: 0.88; }
+
+  @media (max-width: 520px) {
+    .fact-key { min-width: 120px; font-size: 13px; }
+    .fact-val { font-size: 13px; }
+    .header-top { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="header-title">
+      <h1>Denver Lore Night</h1>
+      <p>Trivia prep — 100 questions, 10 categories</p>
+    </div>
+    <span class="event-badge">June 2, 2026</span>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('facts')">Factoids</button>
+    <button class="tab-btn" onclick="showTab('quiz')">Practice quiz</button>
+  </div>
+</header>
+
+<main>
+  <div id="facts" class="tab-panel active">
+    <div class="filter-row" id="fact-filters"></div>
+    <div id="fact-body"></div>
+  </div>
+
+  <div id="quiz" class="tab-panel">
+    <div id="quiz-active">
+      <div class="filter-row" id="quiz-filters"></div>
+      <div class="quiz-controls">
+        <span class="progress-info" id="progress-text">Question 1 of 100</span>
+        <span class="score-pill" id="score-display">Score: 0 / 0</span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+      </div>
+      <div class="q-card">
+        <div class="q-cat-label" id="q-cat"></div>
+        <div class="q-text" id="q-text"></div>
+        <div class="answer-row">
+          <input class="answer-input" id="answer-input" type="text" placeholder="Write your answer, then reveal…" />
+          <button class="reveal-btn" onclick="revealAnswer()">Reveal</button>
+        </div>
+        <div class="answer-box" id="answer-box">
+          <div class="answer-box-label">Answer</div>
+          <div class="answer-box-text" id="answer-text"></div>
+        </div>
+        <div class="grade-row" id="grade-row">
+          <button class="grade-btn got" onclick="grade(true)">✓ Got it</button>
+          <button class="grade-btn missed" onclick="grade(false)">✗ Missed it</button>
+        </div>
+      </div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prev-btn" onclick="navigate(-1)" disabled>← Prev</button>
+        <button class="shuffle-link" onclick="shuffleQ()">Shuffle deck</button>
+        <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next →</button>
+      </div>
+    </div>
+    <div class="done-screen" id="done-screen">
+      <div class="done-score-num" id="done-num"></div>
+      <div class="done-score-label" id="done-label"></div>
+      <div class="done-message" id="done-msg"></div>
+      <button class="restart-btn" onclick="restartQuiz()">Try again</button>
+    </div>
+  </div>
+</main>
+
+<script>
+const FACTS = {
+  "About Denverite": [
+    ["Founded","2016 — same year the RTD A Line opened to DIA"],
+    ["Parent org","Colorado Public Radio (CPR)"],
+    ["10th birthday event","Lore Night at Denver Beer Co., Platte St, June 2, 2026"],
+    ["First newsletter headline",'"Train to the plain" — a pun/typo about the A Line launch'],
+    ["Lead photographer","Kevin J. Beaty — byline on nearly every photo"],
+    ["Supervising editor","Andrew Kenney (since 2024); previously covered state politics for CPR"],
+    ["Notable reporter","Kyle Harris"],
+    ["Covers","Local news, neighborhoods, politics, housing, culture — Denver-focused"],
+    ["Viral 2025 story","Mayor Mike Johnston vowing to block immigration enforcement agents"],
+    ["2025 archive project","A 30-year look at how Denver became a sanctuary city for immigrants"]
+  ],
+  "Founding & Naming": [
+    ["Founded","1858, triggered by the Pike's Peak / Colorado Gold Rush"],
+    ["Named for","Kansas Territorial Governor James W. Denver — who had already resigned when the town was named"],
+    ["Named by","General William Larimer, hoping to curry favor for county seat designation"],
+    ["First permanent structure","A saloon (not a bank, hospital, or house)"],
+    ["First performance","Macbeth — before the city had a school or hospital"],
+    ["Street names","William McGaa named Wewatta (Sioux wife) and Wazee (mistress)"],
+    ["Statehood","Colorado entered the Union August 1, 1876; Denver became capital"],
+    ["Original name","Denver City — the 'City' was eventually dropped"],
+    ["Founding location","Confluence of Cherry Creek and the South Platte River, Nov 22, 1858"],
+    ["Territory","Part of western Kansas Territory at the time of founding"]
+  ],
+  "Mile High Facts": [
+    ["Elevation","Exactly one mile (5,280 ft) above sea level"],
+    ["Capitol step","The 13th step — 'ONE MILE ABOVE SEA LEVEL' is etched into it"],
+    ["Golf balls","Travel ~10% farther than at sea level due to thinner air"],
+    ["Sunshine","More annual hours of sun than San Diego or Miami Beach — ~300 days/year"],
+    ["Parks","200+ parks within city limits; 20,000 acres of mountain parks"],
+    ["Visible peaks","200 named peaks visible; 32 exceed 13,000 ft"],
+    ["Winter","Drier than Phoenix in winter; average February high of 45°F"],
+    ["City size","Denver covers 155 square miles"],
+    ["Nicknames","Mile High City; Queen City of the Plains; Queen City of the West; Cow Town; Wall Street of the West"]
+  ],
+  "Famous Firsts & Weird Facts": [
+    ["Cheeseburger trademark","Louis Ballast, 1935, Humpty Dumpty Barrel Drive-In at 2776 N. Speer Blvd (now a Key Bank)"],
+    ["Led Zeppelin's first US show","Denver Auditorium Arena, 13th & Champa St (opened 1908, closed 1990)"],
+    ["1976 Winter Olympics","Denver was the first city ever to turn down hosting the Olympics — cost, pollution, population growth"],
+    ["Elvis sandwich run","Flew from Memphis to Stapleton Airport for 22 'Fool's Gold Loafs' — PB, grape jelly, one lb. bacon each"],
+    ["Union Station kissing ban","1902 — police banned kissing on platforms because it slowed trains"],
+    ["Marijuana","CO and WA were first states to legalize recreational marijuana, in 2012"],
+    ["Dispensaries vs. Starbucks","Denver has more marijuana dispensaries than Starbucks locations"],
+    ["U.S. Mint","Denver's mint produces ~10 billion coins per year"],
+    ["Great American Beer Festival","Held annually in Denver — one of the largest beer events in the country"],
+    ["Wynkoop Brewing","Denver's first brewpub, opened Oct 18, 1988 by John Hickenlooper (later mayor, then governor) in a LoDo warehouse"]
+  ],
+  "Landmarks & Infrastructure": [
+    ["16th Street Mall","Designed by I.M. Pei (also did the Louvre pyramid); 400,000 pavers resemble a western diamondback rattlesnake from above"],
+    ["Blucifer","Official name 'Mustang'; 32-ft fiberglass sculpture on Peña Blvd at DIA; commissioned 1992 for $300K; installed Feb 11, 2008; artist Luis Jiménez killed by a falling section in 2006; red eyes tribute his father's neon shop"],
+    ["DIA size","Airport sits on more land than the entire island of Manhattan"],
+    ["RTD A Line","Opened 2016, connects Union Station to DIA"],
+    ["Colfax BRT","Bus Rapid Transit began Oct 2024; full project extends to Aurora, done 2027"],
+    ["DPAC","Denver Performing Arts Complex — second largest in the nation; 9 venues"],
+    ["Union Station","Historic hub at 17th & Wynkoop; opened 1881; anchor of LoDo revival"],
+    ["Coors Field","Opened 1995 at 20th & Blake; home of the Colorado Rockies"],
+    ["Ball Arena","Home of Nuggets and Avalanche; formerly Pepsi Center (1999–2020)"],
+    ["Highland Bridge","Pedestrian/bike bridge over I-25 connecting LoHi to LoDo; opened Dec 16, 2006; 325 ft long; $5.2M cost; third of three pedestrian bridges"],
+    ["Cherry Creek Trail","Runs from Franktown to Confluence Park; crown jewel of Denver's urban trail network"],
+    ["South Platte River Trail","36+ miles; used by Indigenous peoples and settlers before Denver existed; merges with Cherry Creek at Confluence Park"],
+    ["Data center moratorium","Passed unanimously by Denver City Council 2026; CoreSite project flagged for using 300M gallons/year; expires May 2027"]
+  ],
+  "Neighborhoods": [
+    ["Five Points","Called the 'Harlem of the West'; major jazz hub 1920s–1950s; Denver's historic Black community center; named for intersection of 26th Ave, 27th St, Washington St & Welton St"],
+    ["RiNo","River North Art District — not one of Denver's 78 official neighborhoods; spans Five Points, Elyria-Swansea, Cole & Globeville"],
+    ["LoHi / Highlands","Lower Highland — northwest of downtown; connected to LoDo by the Highland Bridge; laid out by William Larimer Jr. in 1858"],
+    ["LoDo","Lower Downtown; anchor of Denver's 1990s revival; first light rail (D Line) on Welton in 1994; Coors Field opened 1995"],
+    ["Colfax Ave","One of America's longest commercial streets; countercultural history; BRT under construction"],
+    ["Capitol Hill","Home to the Molly Brown House Museum at 1340 Pennsylvania St"],
+    ["Curtis Park","Oldest residential neighborhood in Denver; part of the broader Five Points area"],
+    ["East High School","Notable alumni: Douglas Fairbanks, Pam Grier, Don Cheadle, Judy Collins; 150th graduating class in 2026"],
+    ["Globeville / Elyria-Swansea","Historically industrial; site of CoreSite data center controversy; among Colorado's most polluted zip codes"],
+    ["Denver total","78 official 'statistical neighborhoods'"]
+  ],
+  "Arts & Culture": [
+    ["Red Rocks","In Morrison, 15 miles west of Denver; opened June 15, 1941; only naturally-occurring acoustically perfect amphitheater in the world"],
+    ["Red Rocks rocks","Ship Rock (stage right) and Creation Rock (stage left) — two 300-ft sandstone monoliths"],
+    ["Red Rocks geology","Fountain Formation, deposited ~280 million years ago; taller than Niagara Falls; area once under inland seas"],
+    ["Red Rocks early name",'"Garden of the Angels" — named by a Colorado judge in the 1870s'],
+    ["Red Rocks — U2","Filmed career-defining 1983 live video 'Under a Blood Red Sky' at Red Rocks"],
+    ["Red Rocks — Beatles","The Beatles played Red Rocks in 1964"],
+    ["Red Rocks — Springsteen","His first-ever outdoor concert was at Red Rocks in 1978"],
+    ["Red Rocks Easter","Easter sunrise service held every year since 1947"],
+    ["Clyfford Still Museum","Opened 2011; houses 93% of abstract expressionist Clyfford Still's lifetime output (~3,125 pieces); in Golden Triangle Creative District"],
+    ["Denver Art Museum","One of the largest museums between Chicago and the West Coast; 70,000+ works; Hamilton Building designed by Daniel Libeskind"],
+    ["Film on the Rocks","Annual outdoor movie series at Red Rocks; presented by Denver Film and Denver Arts & Venues"],
+    ["Denver arts tax","0.1% sales tax funds the Scientific and Cultural Facilities District (SCFD)"]
+  ],
+  "Sports": [
+    ["Denver Broncos","Founded 1960 AFL; joined NFL 1970; 3 Super Bowl wins (1998, 1999, 2016); sold out every non-strike home game since 1970"],
+    ["Broncos Super Bowls","XXXII (Jan 1998), XXXIII (Jan 1999), 50 (Feb 2016 vs. Carolina Panthers)"],
+    ["Denver Nuggets","Founded 1967 as Denver Larks → Denver Rockets → Nuggets (1974); won first NBA championship in 2023"],
+    ["Nuggets name origin","Renamed 'Nuggets' in 1974 to honor Colorado's gold rush; 'Rockets' was already the Houston team's name"],
+    ["Colorado Avalanche","Formerly Quebec Nordiques; moved to Denver 1995; 3 Stanley Cups (1996, 2001, 2022)"],
+    ["Colorado Rockies (MLB)","Expansion team awarded 1993; played at Mile High Stadium first; moved to Coors Field 1995; first World Series: 2007"],
+    ["Colorado Rockies (NHL)","Different team — NHL franchise in Denver 1976–1982; moved to NJ and became the Devils"],
+    ["Empower Field at Mile High","Home of the Broncos; capacity 76,000+; on the site of the original Mile High Stadium"],
+    ["John Elway","Legendary Broncos QB; led team to back-to-back Super Bowl wins 1998–1999"],
+    ["Denver Summit FC","New NWSL women's soccer expansion team; inaugural 2026 season; plays at Centennial Stadium in Centennial, CO"]
+  ],
+  "Notable Residents": [
+    ["Molly Brown","'The Unsinkable Molly Brown'; Titanic survivor (1912); suffragist, activist, philanthropist; lived at 1340 Pennsylvania St — now the Molly Brown House Museum"],
+    ["John Hickenlooper","Co-founded Wynkoop Brewing 1988; Denver mayor; Colorado governor; now U.S. Senator"],
+    ["Neal Cassady","Raised in Denver; Beat Generation icon; inspired Dean Moriarty in Kerouac's On the Road"],
+    ["Jack Kerouac","Visited Denver repeatedly; described it as 'the ultimate destination' in On the Road"],
+    ["Ruth Handler","Born in Denver; co-founded Mattel; invented the Barbie doll"],
+    ["Jack Dempsey","Born in Manassa, CO; world heavyweight boxing champion 1919–1926; 'The Manassa Mauler'"],
+    ["Don Cheadle","East High School alumnus; Academy Award-nominated actor"],
+    ["Pam Grier","East High School alumna; actress known for Foxy Brown and Jackie Brown"],
+    ["Douglas Fairbanks","East High School alumnus; silent film star; co-founder of United Artists"],
+    ["Horace Tabor","Leadville silver magnate; became one of Denver's wealthiest men; lost his fortune in the Silver Crash of 1893; romantic saga with 'Baby Doe' became Colorado legend"],
+    ["Trey Parker","Co-creator of South Park; from Conifer, CO (southwest of Denver)"],
+    ["My Brother's Bar","Historic LoHi bar on Platte St; frequented by Jack Kerouac and Neal Cassady during the Beat era"]
+  ],
+  "Food, Drink & History": [
+    ["Wynkoop Brewing","Denver's first brewpub; opened 1988 in LoDo by John Hickenlooper; credited with catalyzing the LoDo revival; unusual beers have included Rocky Mountain oysters, gummy bears, and green chiles"],
+    ["Great American Beer Festival","Held annually in Denver; one of the country's largest craft beer events"],
+    ["Craft beer","Denver home to 100+ breweries; frequently called the craft beer capital of the US"],
+    ["Dispensaries","Denver has more marijuana dispensaries than Starbucks locations"],
+    ["Restaurant Row","17th Avenue in the Capitol Hill / Uptown area"],
+    ["Union Station market","Growers-only farmers market every Saturday; Union Station has beehives on its roof"],
+    ["KKK in Denver","The Klan had significant political power in Denver in the 1920s, winning several elected offices"],
+    ["Federico Peña","Mayor who prioritized bringing MLB to Denver in the 1980s–90s; Colorado Rockies awarded to Denver in 1993"],
+    ["Colorado governor 2026","Jared Polis is term-limited; 2026 election will determine his successor"],
+    ["Denver teachers strike","2019 — lasted three days"]
+  ]
+};
+
+const ALL_Q = [
+  {cat:"About Denverite",q:"What year was Denverite founded?",a:"2016"},
+  {cat:"About Denverite",q:"What major Denver infrastructure project opened the same year Denverite launched?",a:"The RTD A Line (connecting Union Station to DIA)"},
+  {cat:"About Denverite",q:"What organization owns and operates Denverite?",a:"Colorado Public Radio (CPR)"},
+  {cat:"About Denverite",q:"What was Denverite's first newsletter headline, and what was it about?",a:'"Train to the plain" — a pun/possible typo about the RTD A Line opening to Denver International Airport'},
+  {cat:"About Denverite",q:"Who is the photographer whose byline appears on nearly every Denverite photo?",a:"Kevin J. Beaty"},
+  {cat:"About Denverite",q:"Who has been Denverite's supervising editor since 2024?",a:"Andrew Kenney"},
+  {cat:"About Denverite",q:"What did Mayor Mike Johnston say that went viral nationally, as covered by Denverite?",a:"He vowed to line up with Denverites to physically block immigration enforcement agents"},
+  {cat:"About Denverite",q:"What anniversary is Denverite celebrating at the June 2026 Lore Night event?",a:"Its 10th anniversary"},
+  {cat:"Founding & Naming",q:"Who was Denver named after, and what's the ironic twist?",a:"Kansas Territorial Governor James W. Denver — who had already resigned before the city was named after him"},
+  {cat:"Founding & Naming",q:"Who named Denver, and why?",a:"General William Larimer, to curry favor and get Denver City selected as the county seat of Arapaho County"},
+  {cat:"Founding & Naming",q:"What was the first permanent structure built in Denver?",a:"A saloon"},
+  {cat:"Founding & Naming",q:"What event triggered Denver's founding in 1858?",a:"The Pike's Peak / Colorado Gold Rush"},
+  {cat:"Founding & Naming",q:"What was the first theatrical performance in Denver, before the city had a school or hospital?",a:"Macbeth"},
+  {cat:"Founding & Naming",q:"Early settler William McGaa named two downtown streets after the women in his life. Name them and explain.",a:"Wewatta (after his Sioux wife) and Wazee (after his mistress)"},
+  {cat:"Founding & Naming",q:"When did Colorado become a state, and when did Denver officially become its capital?",a:"Colorado entered the Union on August 1, 1876; Denver became the capital at that time"},
+  {cat:"Founding & Naming",q:"Where exactly did General Larimer stake his founding claim in November 1858?",a:"At the confluence of Cherry Creek and the South Platte River"},
+  {cat:"Mile High Facts",q:"Which step of the State Capitol building is exactly one mile above sea level?",a:"The 13th step — with the words 'ONE MILE ABOVE SEA LEVEL' etched into it"},
+  {cat:"Mile High Facts",q:"How much farther do golf balls travel in Denver compared to sea level?",a:"About 10% farther, due to thinner air at altitude"},
+  {cat:"Mile High Facts",q:"How does Denver's annual sunshine compare to San Diego and Miami Beach?",a:"Denver has more annual hours of sunshine than either city — roughly 300 sunny days per year"},
+  {cat:"Mile High Facts",q:"How many named peaks are visible from Denver, and how many top 13,000 feet?",a:"200 named peaks are visible; 32 of them exceed 13,000 feet"},
+  {cat:"Mile High Facts",q:"What are some of Denver's nicknames?",a:"Mile High City; Queen City of the Plains; Queen City of the West; Cow Town; Wall Street of the West"},
+  {cat:"Mile High Facts",q:"How large is the city of Denver in square miles?",a:"About 155 square miles"},
+  {cat:"Famous Firsts & Weird Facts",q:"Who trademarked the word 'cheeseburger,' and when and where?",a:"Louis Ballast, 1935, at the Humpty Dumpty Barrel Drive-In at 2776 N. Speer Blvd — now a Key Bank"},
+  {cat:"Famous Firsts & Weird Facts",q:"Where did Led Zeppelin play their first show in America?",a:"Denver Auditorium Arena, at 13th & Champa Streets"},
+  {cat:"Famous Firsts & Weird Facts",q:"What dubious distinction does Denver hold regarding the 1976 Winter Olympics?",a:"Denver was the first city ever to turn down hosting the Olympics — voters rejected it over cost, pollution, and population growth"},
+  {cat:"Famous Firsts & Weird Facts",q:"Why did Elvis Presley fly to Denver's Stapleton Airport, and what did he order?",a:"Just to eat — ordered 22 'Fool's Gold Loafs' (peanut butter, grape jelly, one lb. bacon each) from the Colorado Gold Mine Company Steakhouse"},
+  {cat:"Famous Firsts & Weird Facts",q:"What strange rule did Denver's Union Station police enforce starting in 1902?",a:"No kissing on the platforms — it was slowing down the trains"},
+  {cat:"Famous Firsts & Weird Facts",q:"Who co-founded Denver's first brewpub, Wynkoop Brewing, and in what year?",a:"John Hickenlooper (later Denver mayor and Colorado governor), along with three co-founders, in 1988"},
+  {cat:"Famous Firsts & Weird Facts",q:"Colorado and which other state were the first two to legalize recreational marijuana?",a:"Washington state — both passed ballot measures in November 2012"},
+  {cat:"Famous Firsts & Weird Facts",q:"How many coins does the Denver Mint produce annually?",a:"About 10 billion coins per year"},
+  {cat:"Landmarks & Infrastructure",q:"Who designed the 16th Street Mall, and what does the granite pavement resemble from above?",a:"Architect I.M. Pei (who also designed the Louvre glass pyramid); the 400,000 pavers resemble a western diamondback rattlesnake"},
+  {cat:"Landmarks & Infrastructure",q:"What is the official name of 'Blucifer' at DIA, and who was its creator?",a:"Official name is 'Mustang'; created by artist Luis Jiménez"},
+  {cat:"Landmarks & Infrastructure",q:"How did Blucifer's creator die, and what do the red eyes represent?",a:"A section of the sculpture fell on him in 2006, severing an artery. The glowing red eyes are a tribute to his father's neon sign shop."},
+  {cat:"Landmarks & Infrastructure",q:"When was Blucifer installed, and how long was it overdue?",a:"Installed February 11, 2008 — commissioned in 1992, so about 15 years late. Cost grew from $300K to $650K."},
+  {cat:"Landmarks & Infrastructure",q:"How does DIA's land area compare to Manhattan?",a:"DIA sits on more land than the entire island of Manhattan"},
+  {cat:"Landmarks & Infrastructure",q:"What is the Highland Bridge, and when did it open?",a:"A 325-ft pedestrian and bike bridge over I-25 connecting LoHi to LoDo; opened December 16, 2006; cost $5.2 million; third of three such bridges"},
+  {cat:"Landmarks & Infrastructure",q:"Where do the Cherry Creek Trail and South Platte River Trail converge?",a:"Confluence Park in downtown Denver"},
+  {cat:"Landmarks & Infrastructure",q:"What major transit project on Colfax Avenue started in 2024, and when will it be fully complete?",a:"Bus Rapid Transit (BRT) construction began October 2024; the full project extending to Aurora won't be complete until 2027"},
+  {cat:"Landmarks & Infrastructure",q:"What ranking does the Denver Performing Arts Complex hold nationally?",a:"Second largest performing arts complex in the nation"},
+  {cat:"Landmarks & Infrastructure",q:"What happened at Denver City Council in 2026 regarding data centers?",a:"A moratorium on new data centers passed unanimously; a CoreSite project had raised concerns about using 300 million gallons of water per year; moratorium expires May 2027"},
+  {cat:"Neighborhoods",q:"What is Five Points' famous nickname, and why?",a:'"The Harlem of the West" — it was Denver\'s historic Black neighborhood and a major jazz hub from the 1920s through 1950s'},
+  {cat:"Neighborhoods",q:"What do the 'five points' in Five Points literally refer to?",a:"The vertices formed where four streets meet: 26th Ave, 27th St, Washington St, and Welton St"},
+  {cat:"Neighborhoods",q:"Is RiNo an official Denver neighborhood?",a:"No — RiNo (River North Art District) is not one of Denver's 78 official neighborhoods; it spans parts of Five Points, Elyria-Swansea, Cole, and Globeville"},
+  {cat:"Neighborhoods",q:"What is LoHi, and what connects it to downtown?",a:"Lower Highland — a neighborhood northwest of downtown; connected to LoDo by the Highland Bridge over I-25"},
+  {cat:"Neighborhoods",q:"Which neighborhood is home to the Molly Brown House Museum?",a:"Capitol Hill — the house is at 1340 Pennsylvania St"},
+  {cat:"Neighborhoods",q:"What is the oldest residential neighborhood in Denver?",a:"Curtis Park, within the broader Five Points area"},
+  {cat:"Neighborhoods",q:"East High School celebrated what milestone in 2026, and name two famous alumni.",a:"Its 150th graduating class; notable alumni include Don Cheadle, Pam Grier, Douglas Fairbanks, and Judy Collins"},
+  {cat:"Neighborhoods",q:"Which Denver neighborhoods are noted for the best bike infrastructure?",a:"The Highlands, Sloan's Lake, and Berkeley — with 'neighborhood bikeways' on streets like W. 35th Ave and N. Perry St"},
+  {cat:"Neighborhoods",q:"Globeville and Elyria-Swansea are notable for what unfortunate distinction?",a:"Among Colorado's most polluted neighborhoods; site of industrial development and the contested CoreSite data center"},
+  {cat:"Arts & Culture",q:"Where is Red Rocks Amphitheatre located, and when did it officially open?",a:"In Morrison, about 15 miles west of Denver; opened June 15, 1941"},
+  {cat:"Arts & Culture",q:"What are the two 300-foot rock monoliths at Red Rocks called?",a:"Ship Rock (stage right) and Creation Rock (stage left)"},
+  {cat:"Arts & Culture",q:"What is Red Rocks' acoustic claim to fame?",a:"The only naturally-occurring, acoustically perfect amphitheater in the world"},
+  {cat:"Arts & Culture",q:"What was Red Rocks called in the 1870s before it became an amphitheatre?",a:'"Garden of the Angels" — named by a Colorado judge'},
+  {cat:"Arts & Culture",q:"What famous U2 performance was filmed at Red Rocks?",a:"Their 1983 live concert video 'Under a Blood Red Sky,' widely credited with breaking the band in America"},
+  {cat:"Arts & Culture",q:"What famous first did Bruce Springsteen have at Red Rocks?",a:"His first-ever outdoor concert, in 1978"},
+  {cat:"Arts & Culture",q:"What regular Red Rocks tradition has been held every year since 1947?",a:"Easter sunrise service"},
+  {cat:"Arts & Culture",q:"What is the Clyfford Still Museum, and what makes its collection unusual?",a:"A Denver museum opened in 2011 dedicated entirely to one artist — abstract expressionist Clyfford Still — housing 93% of his lifetime output (~3,125 works)"},
+  {cat:"Arts & Culture",q:"What Denver arts tax funds local cultural institutions?",a:"A 0.1% sales tax collected for the Scientific and Cultural Facilities District (SCFD)"},
+  {cat:"Arts & Culture",q:"Who designed the Frederic C. Hamilton Building at the Denver Art Museum?",a:"Architect Daniel Libeskind — also known for the Jewish Museum Berlin and the 9/11 Memorial Museum in New York"},
+  {cat:"Sports",q:"How many Super Bowls have the Denver Broncos won, and which were they?",a:"Three — Super Bowl XXXII (Jan 1998), XXXIII (Jan 1999), and 50 (Feb 2016 vs. Carolina Panthers)"},
+  {cat:"Sports",q:"The Broncos have sold out every home game since what year?",a:"1970 — every non-strike home game since their first NFL season"},
+  {cat:"Sports",q:"What was the Denver Nuggets' original name when they were founded in 1967?",a:"The Denver Larks, then renamed Denver Rockets before the first season, then Denver Nuggets in 1974"},
+  {cat:"Sports",q:"Why did the Nuggets change their name from Rockets to Nuggets in 1974?",a:"'Rockets' was already in use by the Houston Rockets; 'Nuggets' was chosen to honor Colorado's gold rush history"},
+  {cat:"Sports",q:"When did the Denver Nuggets win their first NBA championship?",a:"2023"},
+  {cat:"Sports",q:"Where did the Colorado Avalanche come from before moving to Denver?",a:"Quebec City — they were the Quebec Nordiques before relocating in 1995"},
+  {cat:"Sports",q:"How many Stanley Cups have the Avalanche won?",a:"Three — 1996, 2001, and 2022"},
+  {cat:"Sports",q:"When did the Colorado Rockies (baseball) first play at Coors Field?",a:"1995 — two years after the expansion team entered the league in 1993"},
+  {cat:"Sports",q:"Before the Rockies were a baseball team, what was the Colorado Rockies name used for in Denver?",a:"An NHL hockey team that played in Denver from 1976–1982 before moving to New Jersey and becoming the Devils"},
+  {cat:"Sports",q:"Denver Summit FC is Denver's team in what league, and when was their inaugural season?",a:"The NWSL (National Women's Soccer League); inaugural season 2026"},
+  {cat:"Notable Residents",q:"Who was Molly Brown, and what is she famous for?",a:"Margaret 'Molly' Brown — Titanic survivor (1912), suffragist, activist, and philanthropist; called 'The Unsinkable Molly Brown'"},
+  {cat:"Notable Residents",q:"Where is the Molly Brown House Museum located?",a:"1340 Pennsylvania Street in Capitol Hill, Denver"},
+  {cat:"Notable Residents",q:"Who co-founded Denver's first brewpub and later became Colorado governor?",a:"John Hickenlooper — co-founded Wynkoop Brewing in 1988, became Denver mayor, then Colorado governor, now a U.S. Senator"},
+  {cat:"Notable Residents",q:"Who was Neal Cassady, and what's his Denver connection?",a:"A Beat Generation icon raised in Denver; inspired the character Dean Moriarty in Jack Kerouac's On the Road"},
+  {cat:"Notable Residents",q:"What Denver-connected woman invented the Barbie doll?",a:"Ruth Handler — born in Denver; co-founded Mattel"},
+  {cat:"Notable Residents",q:"Jack Dempsey is a Colorado legend. What was his nickname and what was he famous for?",a:"'The Manassa Mauler' — world heavyweight boxing champion from 1919 to 1926; born in Manassa, Colorado"},
+  {cat:"Notable Residents",q:"Name three famous alumni of East High School.",a:"Don Cheadle, Pam Grier, Douglas Fairbanks, Judy Collins (any three count)"},
+  {cat:"Notable Residents",q:"Who was Horace Tabor, and what happened to him?",a:"A Leadville silver magnate who became one of Denver's wealthiest men; lost his fortune in the Silver Crash of 1893; his romantic saga with 'Baby Doe' became Colorado legend"},
+  {cat:"Notable Residents",q:"Which Colorado town is Trey Parker (South Park co-creator) from?",a:"Conifer, Colorado — a mountain town southwest of Denver"},
+  {cat:"Notable Residents",q:"What historic LoHi bar is associated with the Beat Generation writers who visited Denver?",a:"My Brother's Bar on Platte Street — frequented by Jack Kerouac and Neal Cassady"},
+  {cat:"Food, Drink & History",q:"What Denver brewpub is credited with catalyzing the revitalization of LoDo?",a:"Wynkoop Brewing Company — opened 1988 by John Hickenlooper in a warehouse on what was then called 'Skid Row'"},
+  {cat:"Food, Drink & History",q:"Where does the Great American Beer Festival take place each year?",a:"Denver, Colorado"},
+  {cat:"Food, Drink & History",q:"What is Denver's craft beer claim to fame?",a:"Home to 100+ breweries; frequently called the craft beer capital of the US"},
+  {cat:"Food, Drink & History",q:"What's unusual about Denver's ratio of marijuana dispensaries to Starbucks?",a:"Denver has more marijuana dispensaries than Starbucks locations"},
+  {cat:"Food, Drink & History",q:"What notable food market happens every Saturday at Union Station?",a:"A growers-only farmers market — Union Station even has beehives on its roof"},
+  {cat:"Food, Drink & History",q:"Wynkoop Brewing has brewed some unusual beers. Name one ingredient they've used.",a:"Rocky Mountain oysters (bull testicles), gummy bears, or green chiles — all actual Wynkoop beers"},
+  {cat:"Food, Drink & History",q:"The KKK had significant political power in Denver in what decade?",a:"The 1920s — the Klan won several elected offices and had substantial influence"},
+  {cat:"Food, Drink & History",q:"Who was the Denver mayor who made bringing MLB baseball to the city a priority?",a:"Federico Peña — pushed for it in the 1980s and 1990s; the Rockies were awarded to Denver in 1993"},
+  {cat:"Food, Drink & History",q:"Who is Colorado's governor who is term-limited and cannot run for re-election in 2026?",a:"Jared Polis — serving his second term"},
+  {cat:"Food, Drink & History",q:"Denver teachers went on strike in what year, and for how long?",a:"2019 — the strike lasted three days"},
+  {cat:"Mile High Facts",q:"What is Denver's official elevation in feet?",a:"5,280 feet — exactly one mile"},
+  {cat:"Mile High Facts",q:"Denver sits at the edge of what two geographic regions?",a:"The Great Plains to the east and the Rocky Mountains to the west"},
+  {cat:"Mile High Facts",q:"How many parks does Denver have within city limits?",a:"More than 200 parks within city limits, plus 20,000 acres of mountain parks"},
+  {cat:"Founding & Naming",q:"What river confluence marks the original founding site of Denver?",a:"The confluence of Cherry Creek and the South Platte River"},
+  {cat:"Founding & Naming",q:"What territory was Denver part of when it was founded in 1858?",a:"Western Kansas Territory — before Colorado Territory was created in 1861"},
+  {cat:"Famous Firsts & Weird Facts",q:"What is notable about Denver's location relative to other major Plains cities?",a:"Denver is the westernmost of the Plains cities — right at the foot of the Rockies"},
+  {cat:"Famous Firsts & Weird Facts",q:"Buffalo Bill Cody is buried near Denver. Where?",a:"On top of Lookout Mountain, west of Denver in Jefferson County"},
+  {cat:"Neighborhoods",q:"What Denver neighborhood is known as 'Restaurant Row' and where is it?",a:"The stretch of 17th Avenue in the Capitol Hill / Uptown area"},
+  {cat:"Neighborhoods",q:"What neighborhood sits immediately east of downtown and is known for its arts and nightlife scene?",a:"Capitol Hill — sometimes called the most densely populated neighborhood in Colorado"},
+  {cat:"Arts & Culture",q:"What annual Denver event celebrates the city's craft brewing scene and draws visitors from around the world?",a:"The Great American Beer Festival, held every fall in Denver"},
+  {cat:"Arts & Culture",q:"The Denver Performing Arts Complex contains how many venues, and what national ranking does it hold?",a:"Nine venues; it is the second largest performing arts complex in the nation"}
+];
+
+const CATS = [...new Set(ALL_Q.map(q => q.cat))];
+const FACT_CATS = Object.keys(FACTS);
+
+let activeFacts = new Set(FACT_CATS);
+let activeQuizCats = new Set(CATS);
+let filteredQ = [...ALL_Q];
+let questions = [...ALL_Q];
+let current = 0;
+let scores = {};
+let revealed = {};
+
+function buildFactFilters() {
+  const c = document.getElementById('fact-filters');
+  const all = document.createElement('button');
+  all.className = 'filter-btn active';
+  all.textContent = 'All';
+  all.onclick = () => { activeFacts = new Set(FACT_CATS); renderFacts(); updateFactFilters(); };
+  c.appendChild(all);
+  FACT_CATS.forEach(cat => {
+    const b = document.createElement('button');
+    b.className = 'filter-btn active';
+    b.textContent = cat;
+    b.onclick = () => {
+      if (activeFacts.has(cat)) { if (activeFacts.size > 1) activeFacts.delete(cat); }
+      else activeFacts.add(cat);
+      renderFacts(); updateFactFilters();
+    };
+    c.appendChild(b);
+  });
+}
+
+function updateFactFilters() {
+  const btns = document.querySelectorAll('#fact-filters .filter-btn');
+  btns[0].className = 'filter-btn' + (activeFacts.size === FACT_CATS.length ? ' active' : '');
+  FACT_CATS.forEach((cat, i) => { btns[i + 1].className = 'filter-btn' + (activeFacts.has(cat) ? ' active' : ''); });
+}
+
+function renderFacts() {
+  const body = document.getElementById('fact-body');
+  body.innerHTML = '';
+  FACT_CATS.filter(c => activeFacts.has(c)).forEach(cat => {
+    const sec = document.createElement('div');
+    sec.className = 'category-section';
+    const h = document.createElement('div');
+    h.className = 'cat-heading';
+    h.textContent = cat;
+    sec.appendChild(h);
+    FACTS[cat].forEach(([key, val]) => {
+      const row = document.createElement('div');
+      row.className = 'fact-row';
+      row.innerHTML = `<span class="fact-key">${key}</span><span class="fact-val">${val}</span>`;
+      sec.appendChild(row);
+    });
+    body.appendChild(sec);
+  });
+}
+
+function buildQuizFilters() {
+  const c = document.getElementById('quiz-filters');
+  const all = document.createElement('button');
+  all.className = 'filter-btn active';
+  all.textContent = 'All categories';
+  all.onclick = () => { activeQuizCats = new Set(CATS); applyQuizFilter(); updateQuizFilters(); };
+  c.appendChild(all);
+  CATS.forEach(cat => {
+    const b = document.createElement('button');
+    b.className = 'filter-btn active';
+    b.textContent = cat;
+    b.onclick = () => {
+      if (activeQuizCats.has(cat)) { if (activeQuizCats.size > 1) activeQuizCats.delete(cat); }
+      else activeQuizCats.add(cat);
+      applyQuizFilter(); updateQuizFilters();
+    };
+    c.appendChild(b);
+  });
+}
+
+function updateQuizFilters() {
+  const btns = document.querySelectorAll('#quiz-filters .filter-btn');
+  btns[0].className = 'filter-btn' + (activeQuizCats.size === CATS.length ? ' active' : '');
+  CATS.forEach((cat, i) => { btns[i + 1].className = 'filter-btn' + (activeQuizCats.has(cat) ? ' active' : ''); });
+}
+
+function applyQuizFilter() {
+  filteredQ = ALL_Q.filter(q => activeQuizCats.has(q.cat));
+  questions = [...filteredQ];
+  scores = {}; revealed = {}; current = 0;
+  document.getElementById('quiz-active').style.display = 'block';
+  document.getElementById('done-screen').classList.remove('show');
+  renderQuestion();
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function shuffleQ() {
+  questions = shuffle(filteredQ);
+  scores = {}; revealed = {}; current = 0;
+  document.getElementById('done-screen').classList.remove('show');
+  document.getElementById('quiz-active').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  if (current >= questions.length) { showDone(); return; }
+  const q = questions[current];
+  document.getElementById('q-cat').textContent = q.cat;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('answer-input').value = '';
+  document.getElementById('answer-text').textContent = q.a;
+  const box = document.getElementById('answer-box');
+  const gr = document.getElementById('grade-row');
+  if (revealed[current]) { box.classList.add('show'); gr.classList.add('show'); }
+  else { box.classList.remove('show'); gr.classList.remove('show'); }
+  document.getElementById('progress-text').textContent = `Question ${current + 1} of ${questions.length}`;
+  const graded = Object.keys(scores).length;
+  const correct = Object.values(scores).filter(Boolean).length;
+  document.getElementById('score-display').textContent = `Score: ${correct} / ${graded}`;
+  const pct = questions.length > 0 ? Math.round((current / questions.length) * 100) : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('prev-btn').disabled = current === 0;
+  document.getElementById('next-btn').textContent = current === questions.length - 1 ? 'Finish' : 'Next →';
+  document.getElementById('answer-input').focus();
+}
+
+function revealAnswer() {
+  revealed[current] = true;
+  document.getElementById('answer-box').classList.add('show');
+  document.getElementById('grade-row').classList.add('show');
+}
+
+function grade(correct) { scores[current] = correct; navigate(1); }
+
+function navigate(dir) {
+  current += dir;
+  if (current < 0) current = 0;
+  if (current >= questions.length) { showDone(); return; }
+  renderQuestion();
+}
+
+function showDone() {
+  document.getElementById('quiz-active').style.display = 'none';
+  document.getElementById('done-screen').classList.add('show');
+  const correct = Object.values(scores).filter(Boolean).length;
+  const total = Object.keys(scores).length;
+  const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+  document.getElementById('done-num').textContent = `${correct} / ${total}`;
+  document.getElementById('done-label').textContent = `${pct}% correct`;
+  let msg = 'Keep studying. Denver history is weird and that\'s your competitive advantage.';
+  if (pct >= 90) msg = 'You are absolutely ready. Blucifer smiles upon you.';
+  else if (pct >= 75) msg = 'Solid. Brush up on sports and notable residents and you\'re set.';
+  else if (pct >= 50) msg = 'Getting there. Hit the factoids tab and come back.';
+  document.getElementById('done-msg').textContent = msg;
+}
+
+function restartQuiz() {
+  scores = {}; revealed = {}; current = 0;
+  questions = [...filteredQ];
+  document.getElementById('done-screen').classList.remove('show');
+  document.getElementById('quiz-active').style.display = 'block';
+  renderQuestion();
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', (i === 0 && tab === 'facts') || (i === 1 && tab === 'quiz')));
+  document.getElementById('facts').classList.toggle('active', tab === 'facts');
+  document.getElementById('quiz').classList.toggle('active', tab === 'quiz');
+}
+
+document.getElementById('answer-input').addEventListener('keydown', e => { if (e.key === 'Enter') revealAnswer(); });
+
+buildFactFilters();
+renderFacts();
+buildQuizFilters();
+renderQuestion();
+</script>
+</body>
+</html>
