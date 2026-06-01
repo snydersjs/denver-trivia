@@ -367,7 +367,7 @@
   <div class="header-top">
     <div class="header-title">
       <h1>Denver Lore Night</h1>
-      <p>Trivia prep — 100 questions, 10 categories</p>
+      <p>Trivia prep — 110 questions, 12 categories</p>
     </div>
     <span class="event-badge">June 2, 2026</span>
   </div>
@@ -563,6 +563,28 @@ const FACTS = {
     ["Federico Peña","Mayor who prioritized bringing MLB to Denver in the 1980s–90s; Colorado Rockies awarded to Denver in 1993"],
     ["Colorado governor 2026","Jared Polis is term-limited; 2026 election will determine his successor"],
     ["Denver teachers strike","2019 — lasted three days"]
+  ],
+  "Colfax": [
+    ["Nickname",'"The longest, wickedest street in America" — attributed (disputedly) to Playboy / Hugh Hefner'],
+    ["Length","26.5 miles as a commercial street — longest in the US; over 53 miles total through Aurora, Denver, Lakewood, and Golden"],
+    ["Original name","Golden Road (also Grand Avenue) — renamed Colfax in 1868"],
+    ["Named for","Schuyler Colfax, Speaker of the U.S. House — Denver hoped flattering him would help win statehood; he later became VP under Ulysses S. Grant"],
+    ["Highway designation","U.S. Highway 40 — the 3,157-mile route from Atlantic City to San Francisco"],
+    ["Decline","Construction of I-70 pulled traffic off Colfax; the street gained its seedy reputation as motels turned to other uses"],
+    ["Music venues","The Fillmore, The Ogden Theater, and Lion's Lair are among the most notable"],
+    ["Famous performers","Judy Collins, Bob Dylan, and the Smothers Brothers all got early starts performing on Colfax"],
+    ["State Capitol","The Colorado State Capitol sits on Colfax Avenue"],
+    ["BRT","Bus Rapid Transit construction began October 2024; full project extends to Aurora, complete 2027"]
+  ],
+  "Denver Beer Co.": [
+    ["Founded","2011 — started in the founders' garages from homebrewing"],
+    ["Original building","An old auto body / car garage on Platte Street"],
+    ["Address","1695 Platte St, Denver — at the intersection of RiNo and LoHi"],
+    ["Flagship beers","Graham Cracker Porter and Incredible Pedal IPA are always on tap; most other recipes rarely repeat"],
+    ["Platte Street brewing history","A previous Denver Brewing Company operated at 1611 Platte St in 1945 — just next door to the current brewery"],
+    ["Philosophy","Inspired by Bavarian beer gardens; 'beer is serious fun'"],
+    ["Other locations","Olde Town Arvada, South Downing St, Lowry, Littleton, and Canworks production brewery in Sunnyside"],
+    ["Barrel Room","Adjacent private event space at 1635 Platte St, capacity up to 100"]
   ]
 };
 
@@ -667,6 +689,16 @@ const ALL_Q = [
   {cat:"Neighborhoods",q:"What neighborhood sits immediately east of downtown and is known for its arts and nightlife scene?",a:"Capitol Hill — sometimes called the most densely populated neighborhood in Colorado"},
   {cat:"Arts & Culture",q:"What annual Denver event celebrates the city's craft brewing scene and draws visitors from around the world?",a:"The Great American Beer Festival, held every fall in Denver"},
   {cat:"Arts & Culture",q:"What national ranking does the Denver Performing Arts Complex hold?",a:"Second largest performing arts complex in the nation",bonus:"How many venues does it contain?",bonusA:"Nine venues"},
+  {cat:"Colfax",q:"What is Colfax Avenue's most infamous nickname?",a:'"The longest, wickedest street in America"',bonus:"Who is the quote attributed to?",bonusA:"Playboy magazine / Hugh Hefner — though the attribution is disputed"},
+  {cat:"Colfax",q:"How long is Colfax Avenue as a commercial street?",a:"26.5 miles — the longest commercial street in the United States",bonus:"How long is it if you count the full road beyond the commercial district?",bonusA:"Over 53 miles, stretching through Aurora, Denver, Lakewood, and Golden"},
+  {cat:"Colfax",q:"What was Colfax Avenue originally called before it was renamed in 1868?",a:"Golden Road (also known as Grand Avenue)",bonus:"Who was it renamed after, and why?",bonusA:"Schuyler Colfax, Speaker of the U.S. House of Representatives — Denver residents hoped flattering him would help Colorado gain statehood"},
+  {cat:"Colfax",q:"What U.S. highway designation did Colfax Avenue once carry?",a:"U.S. Highway 40 — running 3,157 miles from Atlantic City to San Francisco"},
+  {cat:"Colfax",q:"What ended Colfax's heyday as a major travel corridor?",a:"The construction of I-70, which pulled travelers off Colfax and onto the interstate"},
+  {cat:"Colfax",q:"Name two famous music venues still operating on Colfax Avenue.",a:"The Fillmore, The Ogden Theater, and Lion's Lair are among the most notable (any two)"},
+  {cat:"Colfax",q:"What was one surprising thing Colfax Avenue is the birthplace of, besides infamy?",a:"The careers of Judy Collins, Bob Dylan, and the Smothers Brothers — who all got early starts performing on Colfax"},
+  {cat:"Denver Beer Co.",q:"What year was Denver Beer Co. founded, and where did it start?",a:"2011 — born out of the founders' home garages from homebrewing",bonus:"What was the original Platte Street building before it became a brewery?",bonusA:"An old auto body shop / car garage"},
+  {cat:"Denver Beer Co.",q:"Where does Denver Beer Co. describe its Platte Street location?",a:"At the intersection of RiNo and LoHi in downtown Denver",bonus:"What are its two always-on-tap flagship beers?",bonusA:"Graham Cracker Porter and Incredible Pedal IPA"},
+  {cat:"Denver Beer Co.",q:"What is historically notable about the address 1611 Platte Street, right next to Denver Beer Co.?",a:"A previous iteration of the Denver Brewing Company operated there in 1945 — showing the Platte Street area's long brewing history"},
 ];
 
 const CATS = [...new Set(ALL_Q.map(q => q.cat))];
@@ -765,7 +797,7 @@ function updateQuizFilters() {
 
 function applyQuizFilter() {
   filteredQ = ALL_Q.filter(q => activeQuizCats.has(q.cat));
-  questions = [...filteredQ];
+  questions = shuffle(filteredQ);
   scores = {}; revealed = {}; bonusRevealed = {}; current = 0;
   document.getElementById('quiz-active').style.display = 'block';
   document.getElementById('done-screen').classList.remove('show');
@@ -877,13 +909,6 @@ function showTab(tab) {
   document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', (i === 0 && tab === 'facts') || (i === 1 && tab === 'quiz')));
   document.getElementById('facts').classList.toggle('active', tab === 'facts');
   document.getElementById('quiz').classList.toggle('active', tab === 'quiz');
-  if (tab === 'quiz') {
-    questions = shuffle(filteredQ);
-    scores = {}; revealed = {}; bonusRevealed = {}; current = 0;
-    document.getElementById('done-screen').classList.remove('show');
-    document.getElementById('quiz-active').style.display = 'block';
-    renderQuestion();
-  }
 }
 
 document.getElementById('answer-input').addEventListener('keydown', e => { if (e.key === 'Enter') revealAnswer(); });
